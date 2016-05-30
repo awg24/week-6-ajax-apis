@@ -1,4 +1,24 @@
-	<style type="text/css">
-		button, div, form, input {
-			margin: 10px;
-		}
+#addAnimeButton{
+	width: auto;
+	padding:5px;
+	font-size: 14px;
+	background-color: #9C27B0;
+	border-radius: 10px;
+}
+button{
+	font-size: 18px;
+	padding:10px;
+	background-color: #009688;
+	margin: 10px;
+	border-radius: 12px;
+	
+}
+#anime-form{
+	float:right;
+}
+#anime-input{
+	width: 150px;
+	height: 30px;
+	font-size: 18px;
+	margin-right: 50px;
+}

@@ -1,174 +1,159 @@
 <html>
 
 <head>
-    <title>Ajax-APIs</title>
+    <title>Anime GIfs</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- ==============================================
                             CSS
     =============================================== -->
     <link rel="stylesheet" href="assets/css/style.css">
-    <link href='https://fonts.googleapis.com/css?family=Playfair+Display' rel='stylesheet' type='text/css'>
     <!-- ==============================================
                             JS
     =============================================== -->
-   <!-- <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.0.min.js"></script> -->
-   <script src='http://code.jquery.com/jquery-2.1.3.min.js'></script>
+    <script src='http://code.jquery.com/jquery-2.1.3.min.js'></script>
     <script type="text/javascript" src="assets/js/script.js"></script>
     <!-- ==============================================
                           JQUERY
     =============================================== -->
-<!--    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> -->
-
+    <!--    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> -->
+    <!-- <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.0.min.js"></script> -->
 </head>
 
 <body>
-<div class="container">
-  <h1>jet Search</h1>
-
-  <!-- Rendered Buttons will get Dumped Here  -->
-  <div id="buttonsView"></div>
-
-  <form id="giphy-form">
-    <label for="giphy-input">Add a jet Bro</label>
-    <input type="text" id="giphy-input"><br>
-    
-    <!-- Button triggers new jet to be added -->
-    <input id="addgiphy" type="submit" value="Add a jet Bro">
-  </form>
-
-
-  <!-- jets will Get Dumped Dere -->
-  <div id="jetsView"></div>
-<script type="text/javascript">
-
-  // Initial array of jets
-  var jets = ['F15', 'dog', 'kitty', 'happy'];
+    <div class="container">
+        <h1>Let's find some anime!</h1>
+        <!-- Rendered Buttons will get Dumped Here  -->
+        <div id="buttonsView"></div>
+        <form id="anime-form">
+            <label for="anime-input">Add an Anime</label>
+            <input type="text" id="anime-input">
+            <br>
+            <!-- Button triggers new jet to be added -->
+            <input id="addAnimeButton" type="submit" value="Submit">
+        </form>
+        <!-- jets will Get Dumped Dere -->
+        <div id="jetsView"></div>
+        <script type="text/javascript">
+        // Initial array of anime
+        var jets = ['speed racer', 'gundam wing', 'attack on titan', 'sword art online', 'log horizon', 'fate/ stay night', 'sakura', 'rououni kenshin', 'GTO', 'black lagoon', 'girls und panzer', 'brave 10', 'pokemon', 'one piece'];
 
 
-//http://api.giphy.com/v1/gifs/search?q=funny+cat&api_key=dc6zaTOxFJmzC   
+        // displaygiphyInfo function now re-renders the HTML to display the appropriate content. 
+        function displaygiphyInfo() {
+            var jet = $(this).attr('data-name');
+            var jetTrimmed = $.trim(jet); // trim extra spaces
+            jetTrimmed = jetTrimmed.replace(/ /g, "+"); // change space to +
+
+            var queryURL = "http://api.giphy.com/v1/gifs/search?q=" + jetTrimmed + "&limit=10&api_key=dc6zaTOxFJmzC ";
+            // Creates AJAX call for the specific jet being 
+            $.ajax({
+                url: queryURL,
+                method: 'GET'
+            }).done(function(response) {
+                console.log(response);
+
+                var state = 'still';
+                for (i = 0; i < 10; i++) {
+                    // Creates a generic div to hold the giphy
+                    var gifDiv = $('<div class="giphy">');
+                    var gifDiv = $('<div>').attr('class', 'giphy');
+
+                    // Creates an element to have the rating displayed
+                    var rating = $('<p>').text("Rating: " + response.data[i].rating);
+                    var data_animate = response.data[i].images.downsized_medium.url;
+                    var data_still = response.data[i].images.original_still.url;
+                    // rating
+                    gifDiv.append(rating);
+
+                    // Creates an element to hold the image 
+                    var image = $('<img>').attr("src", data_still); //response.data[i].images.downsized_medium.url);
+                    image.attr('data-state', 'still');
+                    image.attr('data-still', data_still);
+                    image.attr('data-animate', data_animate);
+                    image.attr('class', 'animeImage');
+                    // Appends the image
+                    gifDiv.append(image);
+
+                    // Puts the entire jet above the previous jets.
+                    $('#jetsView').prepend(gifDiv);
+                }
+            });
+
+        }
+
+        // ========================================================
+
+        function renderButtons() {
+
+            // Deletes the jets prior to adding new jets (this is necessary otherwise you will have repeat buttons)
+            $('#buttonsView').empty();
+
+            // Loops through the array of jets
+            for (var i = 0; i < jets.length; i++) {
+                var a = $('<button>')
+                a.addClass('giphy'); // Added a class 
+                a.attr('data-name', jets[i]); // Added a data-attribute
+                a.text(jets[i]); // Provided the initial button text
+                $('#buttonsView').append(a); // Added the button to the HTML
+            }
+        }
+
+
+        // Start/ stop animation
+        $(document).on('click', '.animeImage', changeState);
+
+
+        function changeState() {
+            var state = $(this).attr('data-state');
+            var animateLink = $(this).attr('data-animate');
+            var stillLink = $(this).attr('data-still');
+            if (state == "still") {
+                $(this).attr('data-state', 'animate');
+                $(this).attr('src', animateLink);
+            } else {
+                $(this).attr('data-state', 'still');
+                $(this).attr('src', stillLink);
+            }
+            console.log($('.animeImage').attr('data-state'));
+        };
 
 
 
-  // ========================================================
 
-  // displaygiphyInfo function now re-renders the HTML to display the appropriate content. 
-  function displaygiphyInfo(){
+        $('#addAnimeButton').on('click', function() {
+            var jet = $('#anime-input').val().trim();
 
-    var jet = $(this).attr('data-name');
-    //var queryURL = "http://www.omdbapi.com/?t=" + jet + "&y=&plot=short&r=json";
-    var queryURL = "http://api.giphy.com/v1/gifs/search?q=" + jet + "&api_key=dc6zaTOxFJmzC ";
-    // Creates AJAX call for the specific jet being 
-    $.ajax({url: queryURL, method: 'GET'}).done(function(response) {
+            // check for duplicate entry before push
 
-
-console.log(response);
-
-
-for(i=0; i<10;i++){
-      // Creates a generic div to hold the giphy
-      var gifDiv = $('<div class="giphy">');
-      var gifDiv = $('<div>').attr('class','giphy');
-
-      // Retrieves the Rating Data
-     // var rating = response.Rated;
- //   var bitly_gif_url = response.bitly_gif_url;
+            if (jets.indexOf(jet) == -1) {
+                jets.push(jet);
+                $('#anime-input').val("");
+                renderButtons();
+            } else {
+               $('#anime-input').val("");
+               alert("Duplicate entry")
 
 
-      // Creates an element to have the rating displayed
-      var rating = $('<p>').text( "Rating: " + response.data[i].rating);
-      var data_animate = response.data[i].images.downsized_medium.url;
-      var data_still = response.data[i].images.original_still.url;
-      // rating
-      gifDiv.append(rating);
-/*
-      // Retrieves the release year
-      var released = response.Released;
-
-      // Creates an element to hold the release year
-      var pTwo = $('<p>').text( "Released: " + released);
-
-      // Displays the release year
-      gifDiv.append(pTwo);
-
-      // Retrieves the plot
-      var plot = response.Plot;
-
-      // Creates an element to hold the plot
-      var pThree = $('<p>').text( "Plot: " + plot);
-
-      // Appends the plot
-      gifDiv.append(pThree);
-  */
-      // Creates an element to hold the image 
-      var image = $('<img>').attr("src", response.data[i].images.downsized_medium.url);
-
-   // <img src="http://media1.giphy.com/media/3o85xkQpyMlnBkpB9C/200_s.gif" data-still="http://media1.giphy.com/media/3o85xkQpyMlnBkpB9C/200_s.gif" data-animate="http://media1.giphy.com/media/3o85xkQpyMlnBkpB9C/200.gif" data-state="animate" class="animalImage">
-
-      // Appends the image
-      gifDiv.append(image);
-
-      // Puts the entire jet above the previous jets.
-      $('#jetsView').prepend(gifDiv);
-}
-
-    
-    });
-
-  }
-
-  // ========================================================
-
-  // Generic function for displaying jet data 
-  function renderButtons(){ 
-
-    // Deletes the jets prior to adding new jets (this is necessary otherwise you will have repeat buttons)
-    $('#buttonsView').empty();
-
-    // Loops through the array of jets
-    for (var i = 0; i < jets.length; i++){
-
-      // Then dynamicaly generates buttons for each jet in the array
-
-      // Note the jQUery syntax here... 
-        var a = $('<button>') // This code $('<button>') is all jQuery needs to create the beginning and end tag. (<button></button>)
-        a.addClass('giphy'); // Added a class 
-        a.attr('data-name', jets[i]); // Added a data-attribute
-        a.text(jets[i]); // Provided the initial button text
-        $('#buttonsView').append(a); // Added the button to the HTML
-    }
-  }
-
-  // ========================================================
-
-  // This function handles events where one button is clicked
-  $('#addgiphy').on('click', function(){
-
-    // This line of code will grab the input from the textbox
-    var jet = $('#giphy-input').val().trim();
-
-    // The jet from the textbox is then added to our array
-    jets.push(giphy);
-    
-    // Our array then runs which handles the processing of our jet array
-    renderButtons();
-
-    // We have this line so that users can hit "enter" instead of clicking on ht button and it won't move to the next page
-    return false;
-  })
-
-  // ========================================================
-
-  // Generic function for displaying the giphyInfo
-  $(document).on('click', '.giphy', displaygiphyInfo);
+            }
 
 
-  // ========================================================
+            return false; // submit on enter
+        })
 
-  // This calls the renderButtons() function
-  renderButtons();
+        $(document).on('click', '.giphy', displaygiphyInfo);
 
+        renderButtons();
 
-</script>
+        /*
+
+        009688
+        00BCD4
+        3F51B5
+        673AB7
+        9C27B0
+
+        */
+        </script>
 </body>
 
 </html>
