@@ -1,119 +1,117 @@
-// Initial array of jets
-var jets = ['F16', 'Phantom', 'Tomcat', 'B52'];
-var key = 'dc6zaTOxFJmzC';
+    $(document).ready(function() {
+        // Initial array of anime
+        var jets = ['speed racer', 'gundam wing', 'attack on titan', 'sword art online', 'log horizon', 'fate/ stay night', 'sakura', 'rououni kenshin', 'GTO', 'black lagoon', 'girls und panzer', 'brave 10', 'pokemon', 'one piece'];
 
-var search = "http://api.giphy.com/v1/gifs/search?q=F15&api_key=dc6zaTOxFJmzC"
-var movies = ['The Matrix', 'The Notebook', 'Mr. Nobody', 'The Lion King'];
 
-function displayGifyStuff() {
-    var jet = $(this).attr('data-name');
-    var queryURL = "http://www.omdbapi.com/?t=" + movie + "&y=&plot=short&r=json";
-}
+        // displaygiphyInfo function now re-renders the HTML to display the appropriate content. 
+        function displaygiphyInfo() {
+            var jet = $(this).attr('data-name');
+            var jetTrimmed = $.trim(jet); // trim extra spaces
+            jetTrimmed = jetTrimmed.replace(/ /g, "+"); // change space to +
 
-// Initial array of movies
-    var movies = ['The Matrix', 'The Notebook', 'Mr. Nobody', 'The Lion King'];
+            var queryURL = "http://api.giphy.com/v1/gifs/search?q=" + jetTrimmed + "&limit=10&api_key=dc6zaTOxFJmzC ";
+            // Creates AJAX call for the specific jet being 
+            $.ajax({
+                url: queryURL,
+                method: 'GET'
+            }).done(function(response) {
+                console.log(response);
 
-    // ========================================================
+                var state = 'still';
+                for (i = 0; i < 10; i++) {
+                    // Creates a generic div to hold the giphy
+                    var gifDiv = $('<div class="giphy">');
+                    var gifDiv = $('<div>').attr('class', 'giphy');
+                    // Creates an element to have the rating displayed
+                    var rating = $('<p>').text("Rating: " + response.data[i].rating);
+                    var data_animate = response.data[i].images.downsized_medium.url;
+                    var data_still = response.data[i].images.original_still.url;
+                    // rating
+                    gifDiv.append(rating);
 
-    // displayMovieInfo function now re-renders the HTML to display the appropriate content. 
-    function displayMovieInfo(){
+                    // Creates an element to hold the image 
+                    var image = $('<img>').attr("src", data_still); //response.data[i].images.downsized_medium.url);
+                    image.attr('data-state', 'still');
+                    image.attr('data-still', data_still);
+                    image.attr('data-animate', data_animate);
+                    image.attr('class', 'animeImage');
+                    // Appends the image
+                    gifDiv.append(image);
 
-        var movie = $(this).attr('data-name');
-        var queryURL = "http://www.omdbapi.com/?t=" + movie + "&y=&plot=short&r=json";
-        
-        // Creates AJAX call for the specific movie being 
-        $.ajax({url: queryURL, method: 'GET'}).done(function(response) {
+                    // Puts the entire jet above the previous jets.
+                    $('#jetsView').prepend(gifDiv);
+                }
+            });
 
-            // Creates a generic div to hold the movie
-            var movieDiv = $('<div class="movie">');
-            var movieDiv = $('<div>').attr('class','movie');
-
-            // Retrieves the Rating Data
-            var rating = response.Rated;
-
-            // Creates an element to have the rating displayed
-            var pOne = $('<p>').text( "Rating: " + rating);
-
-            // Displays the rrating
-            movieDiv.append(pOne);
-
-            // Retrieves the release year
-            var released = response.Released;
-
-            // Creates an element to hold the release year
-            var pTwo = $('<p>').text( "Released: " + released);
-
-            // Displays the release year
-            movieDiv.append(pTwo);
-
-            // Retrieves the plot
-            var plot = response.Plot;
-
-            // Creates an element to hold the plot
-            var pThree = $('<p>').text( "Plot: " + plot);
-
-            // Appends the plot
-            movieDiv.append(pThree);
-
-            // Creates an element to hold the image 
-            var image = $('<img>').attr("src", response.Poster);
-
-            // Appends the image
-            movieDiv.append(image);
-
-            // Puts the entire Movie above the previous movies.
-            $('#moviesView').prepend(movieDiv);
-        });
-
-    }
-
-    // ========================================================
-
-    // Generic function for displaying movie data 
-    function renderButtons(){ 
-
-        // Deletes the movies prior to adding new movies (this is necessary otherwise you will have repeat buttons)
-        $('#buttonsView').empty();
-
-        // Loops through the array of movies
-        for (var i = 0; i < movies.length; i++){
-
-            // Then dynamicaly generates buttons for each movie in the array
-
-            // Note the jQUery syntax here... 
-            var a = $('<button>') // This code $('<button>') is all jQuery needs to create the beginning and end tag. (<button></button>)
-            a.addClass('movie'); // Added a class 
-            a.attr('data-name', movies[i]); // Added a data-attribute
-            a.text(movies[i]); // Provided the initial button text
-            $('#buttonsView').append(a); // Added the button to the HTML
         }
-    }
 
-    // ========================================================
+        // ========================================================
 
-    // This function handles events where one button is clicked
-    $('#addMovie').on('click', function(){
+        function renderButtons() {
 
-        // This line of code will grab the input from the textbox
-        var movie = $('#movie-input').val().trim();
+            // Deletes the jets prior to adding new jets (this is necessary otherwise you will have repeat buttons)
+            $('#buttonsView').empty();
 
-        // The movie from the textbox is then added to our array
-        movies.push(movie);
-        
-        // Our array then runs which handles the processing of our movie array
+            // Loops through the array of jets
+            for (var i = 0; i < jets.length; i++) {
+                var a = $('<button>')
+                a.addClass('giphy'); 
+                a.addClass('button'); 
+                a.attr('data-name', jets[i]); // Added a data-attribute
+                a.text(jets[i]); // Provided the initial button text
+                $('#buttonsView').append(a); // Added the button to the HTML
+            }
+        }
+
+
+        // Start/ stop animation
+        $(document).on('click', '.animeImage', changeState);
+
+
+        function changeState() {
+            var state = $(this).attr('data-state');
+            var animateLink = $(this).attr('data-animate');
+            var stillLink = $(this).attr('data-still');
+            if (state == "still") {
+                $(this).attr('data-state', 'animate');
+                $(this).attr('src', animateLink);
+            } else {
+                $(this).attr('data-state', 'still');
+                $(this).attr('src', stillLink);
+            }
+            console.log($('.animeImage').attr('data-state'));
+        };
+
+
+        $('#addAnimeButton').on('click', function() {
+            var jet = $('#anime-input').val().trim();
+
+            // check for duplicate entry before push
+
+            if (jets.indexOf(jet) == -1) {
+                jets.push(jet);
+                $('#anime-input').val("");
+                renderButtons();
+            } else {
+                $('#anime-input').val("");
+                alert("Duplicate entry")
+            }
+
+            return false; // submit on enter
+        })
+
+        $(document).on('click', 'button' , displaygiphyInfo);
+
         renderButtons();
 
-        // We have this line so that users can hit "enter" instead of clicking on ht button and it won't move to the next page
-        return false;
-    })
+        /*
+.giphy'
+        009688
+        00BCD4
+        3F51B5
+        673AB7
+        9C27B0
 
-    // ========================================================
+        */
 
-    // Generic function for displaying the movieInfo
-    $(document).on('click', '.movie', displayMovieInfo);
-
-
-    // ========================================================
-
-    // This calls the renderButtons() function
-    renderButtons();
+    }); // document ready

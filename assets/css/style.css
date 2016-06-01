@@ -1,3 +1,7 @@
+body{
+	color: black;
+	background-color: #FCDE7B;
+}
 #addAnimeButton{
 	width: auto;
 	padding:5px;
@@ -21,4 +25,20 @@ button{
 	height: 30px;
 	font-size: 18px;
 	margin-right: 50px;
+}
+img{
+	height: 200px;
+	display: block;
+	margin: 20px;
+}
+.giphy{
+	float: left;
+}
+p{
+	margin-left: 30px;
+}
+.divider{
+	height: 210px;
+	width: 100%;
+
 }
