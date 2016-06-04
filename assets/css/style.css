@@ -1,6 +1,6 @@
 body{
 	color: black;
-	background-color: #FCDE7B;
+	background-color: #0099ff ; /*FCDE7B;*/
 }
 #addAnimeButton{
 	width: auto;
@@ -27,7 +27,7 @@ button{
 	margin-right: 50px;
 }
 img{
-	height: 200px;
+	height: 250px;
 	display: block;
 	margin: 20px;
 }
